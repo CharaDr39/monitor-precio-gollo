@@ -7,8 +7,6 @@ from email.message import EmailMessage
 
 PRODUCT_URL = "https://www.gollo.com/monitor-gaming-acer-ips-27-fhd-negro-vg270p6bip-1004030007/p"
 LAST_PRICE_FILE = "last_price.txt"
-TARGET_MIN_PRICE = 40000
-TARGET_MAX_PRICE = 60000
 
 
 def clean_price(value):
@@ -83,10 +81,6 @@ def get_price_from_page():
     return prices[0]
 
 
-def format_crc(price):
-    return f"₡{price:,.0f}".replace(",", ".")
-
-
 def send_email(old_price, new_price):
     email_from = os.environ["EMAIL_FROM"]
     email_to = os.environ["EMAIL_TO"]
@@ -101,45 +95,22 @@ def send_email(old_price, new_price):
 
     difference = new_price - old_price
 
-    is_target_price = TARGET_MIN_PRICE <= new_price <= TARGET_MAX_PRICE
-
     msg = EmailMessage()
-
-    if is_target_price:
-        msg["Subject"] = f"🚨 COMPRALO YA: el monitor está en {format_crc(new_price)} 🚨"
-        body = f"""🚨 PRECIO OBJETIVO DETECTADO 🚨
-
-El monitor Acer en Gollo está dentro del rango que querías.
-
-Precio anterior: {format_crc(old_price)}
-Precio nuevo: {format_crc(new_price)}
-Diferencia: {format_crc(difference)}
-
-Rango objetivo:
-{format_crc(TARGET_MIN_PRICE)} - {format_crc(TARGET_MAX_PRICE)}
-
-COMPRALO YA ANTES DE QUE GOLLO SE ACUERDE DE QUE EXISTE LA INFLACIÓN.
-
-Link:
-{PRODUCT_URL}
-"""
-    else:
-        msg["Subject"] = f"El monitor {movement}: {format_crc(new_price)}"
-        body = f"""El precio del monitor Acer en Gollo cambió.
-
-Precio anterior: {format_crc(old_price)}
-Precio nuevo: {format_crc(new_price)}
-Diferencia: {format_crc(difference)}
-
-Todavía no está en el rango objetivo de {format_crc(TARGET_MIN_PRICE)} a {format_crc(TARGET_MAX_PRICE)}.
-
-Link:
-{PRODUCT_URL}
-"""
-
+    msg["Subject"] = f"El monitor {movement}: ₡{new_price:,}"
     msg["From"] = email_from
     msg["To"] = email_to
-    msg.set_content(body)
+
+    msg.set_content(
+        f"""El precio del monitor Acer en Gollo cambió.
+
+Precio anterior: ₡{old_price:,}
+Precio nuevo: ₡{new_price:,}
+Diferencia: ₡{difference:,}
+
+Link:
+{PRODUCT_URL}
+"""
+    )
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(email_from, email_password)
