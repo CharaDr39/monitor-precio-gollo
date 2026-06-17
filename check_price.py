@@ -49,23 +49,36 @@ def get_price_from_page():
     soup = BeautifulSoup(response.text, "html.parser")
     page_text = soup.get_text(" ", strip=True)
 
-    # Busca precios con símbolo ₡
-    matches = re.findall(r"₡\s?[\d.,]+", page_text)
+    product_name = 'Monitor Gaming Acer IPS 27" FHD Negro VG270P6BIP'
+
+    start_index = page_text.find(product_name)
+
+    if start_index == -1:
+        raise ValueError("No encontré el nombre del producto en la página.")
+
+    # Tomamos solo una parte cercana al producto, no toda la página
+    product_section = page_text[start_index:start_index + 2000]
+
+    matches = re.findall(r"₡\s?[\d.,]+", product_section)
 
     prices = []
 
     for match in matches:
         price = clean_price(match)
 
-        # Filtro para evitar precios absurdos tipo cuotas muy pequeñas
-        if price and price >= 10000:
+        # Evita cuotas pequeñas tipo ₡7.492
+        # y evita montos raros demasiado bajos
+        if price and 40000 <= price <= 200000:
             prices.append(price)
 
-    if not prices:
-        raise ValueError("No encontré precios válidos en la página.")
+    print("Precios encontrados cerca del producto:")
+    print(prices)
 
-    # Usamos el menor precio razonable porque normalmente es el precio de oferta
-    return min(prices)
+    if not prices:
+        raise ValueError("No encontré precios válidos cerca del producto.")
+
+    # El precio actual normalmente aparece antes que el precio tachado
+    return prices[0]
 
 
 def send_email(old_price, new_price):
