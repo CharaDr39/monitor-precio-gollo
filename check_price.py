@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
 
-PRODUCT_URL = "https://www.gollo.com/monitor-gaming-acer-ips-27-fhd-negro-vg270p6bip-1004030007/p"
+PRODUCT_URL = "https://www.gollo.com/playstation-5-slim-digital-825-gb-gran-turismo-7-y-astro-bot-1002010096/p"
 LAST_PRICE_FILE = "last_price.txt"
 
 
