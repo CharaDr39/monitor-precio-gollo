@@ -49,7 +49,7 @@ def get_price_from_page():
     soup = BeautifulSoup(response.text, "html.parser")
     page_text = soup.get_text(" ", strip=True)
 
-    product_name = 'Monitor Gaming Acer IPS 27" FHD Negro VG270P6BIP'
+    product_name = 'PlayStation 5 Slim Digital 825GB Gran Turismo 7 y Astro Bot'
 
     start_index = page_text.find(product_name)
 
@@ -101,7 +101,7 @@ def send_email(old_price, new_price):
     msg["To"] = email_to
 
     msg.set_content(
-        f"""El precio del monitor Acer en Gollo cambió.
+        f"""El precio del PS5 en Gollo cambió.
 
 Precio anterior: ₡{old_price:,}
 Precio nuevo: ₡{new_price:,}
@@ -140,7 +140,7 @@ def main():
         save_last_price(new_price)
         print("Correo enviado y precio actualizado.")
     else:
-        print("El precio no cambió. El monitor sigue jugando con tus emociones, pero no hoy.")
+        print("El precio no cambió. El PS5 sigue jugando con tus emociones, pero no hoy.")
 
 
 if __name__ == "__main__":
